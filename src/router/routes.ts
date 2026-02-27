@@ -10,7 +10,7 @@ import type { RouteRecordRaw } from 'vue-router';
  * │  /login  →  LoginPage  (인증 불필요, 로그인 상태면 /로 리다이렉트)  │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │  /       →  MainLayout  (인증 필요 - requiresAuth: true)            │
- * │    └── (기본 자식 경로: '')  →  IndexPage                           │
+ * │             MainLayout이 탭 방식으로 콘텐츠를 직접 관리             │
  * ├─────────────────────────────────────────────────────────────────────┤
  * │  /:catchAll(.*)*  →  ErrorNotFound (404 처리)                       │
  * └─────────────────────────────────────────────────────────────────────┘
@@ -30,16 +30,10 @@ const routes: RouteRecordRaw[] = [
   {
     // 메인 레이아웃이 감싸는 인증 필요 영역
     // requiresAuth: 비로그인 상태로 접근하면 네비게이션 가드가 /login으로 리다이렉트
+    // children 없음: MainLayout이 탭 방식으로 콘텐츠를 직접 관리
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     meta: { requiresAuth: true },
-    children: [
-      {
-        // 정확히 '/' 경로일 때 IndexPage를 렌더링
-        path: '',
-        component: () => import('pages/IndexPage.vue'),
-      },
-    ],
   },
 
   // 위에 정의된 어떤 경로에도 해당하지 않는 경우 404 페이지로 이동.

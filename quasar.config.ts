@@ -99,6 +99,14 @@ export default defineConfig((ctx) => {
     devServer: {
       // https: true,
       open: true, // opens browser window automatically
+      proxy: {
+        // 백엔드 API 경로를 개발 서버가 중계하여 CORS 우회
+        // 브라우저 → localhost:9000/auth/... → (proxy) → localhost:8080/auth/...
+        '/auth': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+        },
+      },
     },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework

@@ -25,7 +25,9 @@ declare module 'vue' {
  * 발생할 수 있다. SSR을 사용한다면 아래 export default 함수 내부에서 인스턴스를 생성할 것.
  */
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  // 개발: Vite 프록시(quasar.config.ts devServer.proxy)가 요청을 백엔드로 중계
+  // 운영: 배포 시 실제 백엔드 URL로 변경 필요
+  baseURL: '',
   timeout: 10000, // 10초 타임아웃
 });
 

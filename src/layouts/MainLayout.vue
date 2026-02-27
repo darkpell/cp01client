@@ -1,121 +1,194 @@
 <template>
-  <!--
-    Quasar의 q-layout 컴포넌트: 전체 페이지 레이아웃 골격을 정의한다.
-    view="lHh Lpr lFf": 헤더/풋터/드로어의 고정 방식을 지정하는 레이아웃 문자열.
-      - lHh: left drawer는 헤더 위에 표시
-      - Lpr: 상단 헤더(L), 페이지 콘텐츠(p), 오른쪽 드로어(r)
-      - lFf: left drawer는 풋터 아래에 표시
-  -->
-  <q-layout view="lHh Lpr lFf">
-
-    <!--
-      상단 헤더 영역. elevated 속성으로 그림자 효과를 준다.
-    -->
+  <q-layout view="hHh lpR fFf" @click="closeSubMenu">
+    <!-- ── 상단 헤더 ── -->
     <q-header elevated>
       <q-toolbar>
-        <!-- 햄버거 메뉴 버튼: 클릭 시 왼쪽 드로어(사이드바)를 열고 닫는다 -->
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
+        <q-icon name="apps" size="28px" class="q-mr-sm" />
+        <q-toolbar-title shrink class="q-mr-lg">CP01 시스템</q-toolbar-title>
 
-        <!-- 앱 제목 표시 영역 (flex: 1로 남은 공간을 채움) -->
-        <q-toolbar-title> Quasar App </q-toolbar-title>
+        <!-- 상위 메뉴 버튼들 -->
+        <q-btn
+          v-for="menu in menuConfig"
+          :key="menu.id"
+          flat
+          :label="menu.label"
+          :class="activeMenu === menu.id ? 'bg-blue-8' : ''"
+          class="q-mr-xs"
+          @click.stop="toggleMenu(menu.id)"
+        />
 
-        <!-- Quasar 버전 표시 ($q.version: Quasar 전역 객체에서 버전 정보 제공) -->
-        <div>Quasar v{{ $q.version }}</div>
+        <q-space />
+
+        <span class="text-body2 q-mr-md">{{ authStore.userId }}</span>
+        <q-btn flat dense icon="logout" label="로그아웃" @click="handleLogout" />
       </q-toolbar>
+
+      <!-- 하위 메뉴 슬라이드 바 -->
+      <transition name="submenu">
+        <div v-if="activeMenu" class="submenu-bar" @click.stop>
+          <q-toolbar dense class="bg-blue-8">
+            <template v-for="menu in menuConfig" :key="menu.id">
+              <template v-if="activeMenu === menu.id">
+                <q-btn
+                  v-for="item in menu.children"
+                  :key="item.name"
+                  flat
+                  dense
+                  :label="item.label"
+                  class="q-mr-xs"
+                  @click="openSubMenuTab(item)"
+                />
+              </template>
+            </template>
+          </q-toolbar>
+        </div>
+      </transition>
     </q-header>
 
-    <!--
-      왼쪽 사이드 드로어(서랍) 영역.
-      v-model="leftDrawerOpen": 반응형 변수로 열림/닫힘 상태를 제어한다.
-      show-if-above: 화면이 일정 크기(md) 이상이면 드로어를 항상 표시한다 (반응형 레이아웃).
-      bordered: 드로어 오른쪽에 경계선을 표시한다.
-    -->
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list>
-        <q-item-label header> Essential Links </q-item-label>
-
-        <!--
-          linksList 배열을 순회하며 EssentialLink 컴포넌트를 렌더링한다.
-          v-bind="link": link 객체의 모든 속성을 EssentialLink의 props로 한 번에 전달한다.
-        -->
-        <EssentialLink v-for="link in linksList" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
-
-    <!--
-      페이지 콘텐츠 영역. <router-view>가 현재 라우트에 맞는 페이지 컴포넌트를 렌더링한다.
-    -->
+    <!-- ── 콘텐츠 영역 ── -->
     <q-page-container>
-      <router-view />
+      <q-page class="column no-wrap">
+        <!-- 탭 목록 -->
+        <q-tabs
+          v-model="tabStore.activeTab"
+          align="left"
+          dense
+          class="bg-grey-2 text-grey-8"
+          active-color="primary"
+          indicator-color="primary"
+          narrow-indicator
+        >
+          <q-tab
+            v-for="tab in tabStore.tabs"
+            :key="tab.name"
+            :name="tab.name"
+            :icon="tab.icon"
+            :label="tab.label"
+          >
+            <q-btn
+              v-if="tab.name !== 'home'"
+              flat
+              dense
+              round
+              size="xs"
+              icon="close"
+              class="q-ml-xs"
+              @click.stop="tabStore.closeTab(tab.name)"
+            />
+          </q-tab>
+        </q-tabs>
+
+        <q-separator />
+
+        <!-- 탭 콘텐츠 (v-show로 상태 유지) -->
+        <div class="col relative-position">
+          <div
+            v-for="tab in tabStore.tabs"
+            :key="tab.name"
+            v-show="tabStore.activeTab === tab.name"
+            class="absolute-full overflow-auto"
+          >
+            <component :is="componentMap[tab.component]" v-bind="tab.props" />
+          </div>
+        </div>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { ref, type Component } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from 'stores/auth-store';
+import { useTabStore, type TabItem } from 'stores/tab-store';
+import IndexPage from 'pages/IndexPage.vue';
+import SamplePage from 'pages/SamplePage.vue';
 
-/**
- * 사이드 드로어에 표시할 외부 링크 목록.
- * 각 항목은 EssentialLink 컴포넌트의 props에 해당하는 EssentialLinkProps 타입을 따른다.
- */
-const linksList: EssentialLinkProps[] = [
+const router = useRouter();
+const authStore = useAuthStore();
+const tabStore = useTabStore();
+
+// ── 컴포넌트 맵 ──
+const componentMap: Record<string, Component> = {
+  IndexPage,
+  SamplePage,
+};
+
+// ── 메뉴 설정 ──
+interface SubMenuItem {
+  name: string;
+  label: string;
+  component: string;
+  props?: Record<string, unknown>;
+}
+interface MenuConfig {
+  id: string;
+  label: string;
+  children: SubMenuItem[];
+}
+
+const menuConfig: MenuConfig[] = [
   {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev',
+    id: 'business',
+    label: '업무관리',
+    children: [
+      { name: 'work-status', label: '업무현황', component: 'SamplePage', props: { pageTitle: '업무현황' } },
+      { name: 'work-register', label: '업무등록', component: 'SamplePage', props: { pageTitle: '업무등록' } },
+    ],
   },
   {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework',
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev',
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev',
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev',
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev',
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev',
+    id: 'system',
+    label: '시스템관리',
+    children: [
+      { name: 'user-mgmt', label: '사용자관리', component: 'SamplePage', props: { pageTitle: '사용자관리' } },
+      { name: 'menu-mgmt', label: '메뉴관리', component: 'SamplePage', props: { pageTitle: '메뉴관리' } },
+    ],
   },
 ];
 
-/**
- * 왼쪽 드로어(사이드바)의 열림/닫힘 상태를 관리하는 반응형 변수.
- * 초기값 false: 앱 시작 시 드로어는 닫혀 있다.
- * (show-if-above 속성에 의해 화면이 넓으면 자동으로 열릴 수 있다)
- */
-const leftDrawerOpen = ref(false);
+// ── 하위 메뉴 토글 ──
+const activeMenu = ref<string | null>(null);
 
-/**
- * 드로어 열림/닫힘 상태를 토글한다.
- * 헤더의 햄버거 메뉴 버튼 클릭 이벤트에 바인딩된다.
- */
-function toggleLeftDrawer() {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+function toggleMenu(menuId: string) {
+  activeMenu.value = activeMenu.value === menuId ? null : menuId;
+}
+
+function closeSubMenu() {
+  activeMenu.value = null;
+}
+
+function openSubMenuTab(item: SubMenuItem) {
+  const tab: TabItem = {
+    name: item.name,
+    label: item.label,
+    component: item.component,
+    ...(item.props !== undefined && { props: item.props }),
+  };
+  tabStore.openTab(tab);
+  activeMenu.value = null;
+}
+
+// ── 로그아웃 ──
+function handleLogout() {
+  authStore.logout();
+  void router.push('/login');
 }
 </script>
+
+<style scoped>
+.submenu-enter-active,
+.submenu-leave-active {
+  transition: max-height 0.2s ease, opacity 0.2s ease;
+  overflow: hidden;
+}
+.submenu-enter-from,
+.submenu-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+.submenu-enter-to,
+.submenu-leave-from {
+  max-height: 48px;
+  opacity: 1;
+}
+</style>
