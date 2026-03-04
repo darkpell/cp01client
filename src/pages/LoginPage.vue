@@ -2,10 +2,8 @@
   <!-- 전체 화면을 채우는 배경. 중앙 정렬로 로그인 카드를 배치한다. -->
   <!-- q-page는 q-layout 없이 단독 사용 불가 → div + fullscreen 클래스로 대체 -->
   <div class="fullscreen column flex-center bg-grey-2">
-
     <!-- 로그인 카드: 최대 너비 400px, 모바일에서는 화면 90% 너비 -->
-    <q-card flat bordered style="width: 400px; max-width: 90vw;">
-
+    <q-card flat bordered style="width: 400px; max-width: 90vw">
       <!-- 헤더: 아이콘 + 타이틀 -->
       <q-card-section class="text-center q-pt-xl q-pb-sm">
         <q-icon name="lock_person" size="60px" color="primary" />
@@ -20,13 +18,12 @@
           greedy: 모든 필드의 유효성 검사를 한 번에 실행한다.
         -->
         <q-form ref="loginForm" @submit.prevent="onSubmit" greedy>
-
           <!-- 사번 입력 필드 -->
           <q-input
             v-model="form.userId"
             label="사번"
             outlined
-            :rules="[val => !!val || '사번을 입력하세요.']"
+            :rules="[(val) => !!val || '사번을 입력하세요.']"
             :disable="isLoading"
             autofocus
           >
@@ -42,7 +39,7 @@
             outlined
             class="q-mt-sm"
             :type="showPassword ? 'text' : 'password'"
-            :rules="[val => !!val || '비밀번호를 입력하세요.']"
+            :rules="[(val) => !!val || '비밀번호를 입력하세요.']"
             :disable="isLoading"
             @keyup.enter="onSubmit"
           >
@@ -66,7 +63,7 @@
             dense
             rounded
             class="bg-red-1 text-negative q-mt-md"
-            style="font-size: 0.85rem;"
+            style="font-size: 0.85rem"
           >
             <template #avatar>
               <q-icon name="error_outline" />
@@ -84,12 +81,9 @@
             class="full-width q-mt-lg"
             :loading="isLoading"
           />
-
         </q-form>
       </q-card-section>
-
     </q-card>
-
   </div>
 </template>
 
@@ -141,7 +135,8 @@ async function onSubmit() {
       'response' in error &&
       typeof (error as { response?: unknown }).response === 'object'
     ) {
-      const response = (error as { response: { status: number; data?: { error?: string } } }).response;
+      const response = (error as { response: { status: number; data?: { error?: string } } })
+        .response;
       if (response.status === 401) {
         errorMessage.value = '사번 또는 비밀번호가 올바르지 않습니다.';
       } else if (response.data?.error) {

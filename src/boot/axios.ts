@@ -10,7 +10,7 @@ import axios, { type AxiosInstance } from 'axios';
 declare module 'vue' {
   interface ComponentCustomProperties {
     $axios: AxiosInstance; // 기본 Axios 인스턴스 (baseURL 없음)
-    $api: AxiosInstance;   // 서버 API 전용 인스턴스 (baseURL 설정됨)
+    $api: AxiosInstance; // 서버 API 전용 인스턴스 (baseURL 설정됨)
   }
 }
 

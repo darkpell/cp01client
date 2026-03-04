@@ -33,4 +33,6 @@ yarn-error.log*
 .env.local*
 
 # Claude Code (machine-specific, should not be shared)
+.bkit/
 .claude/
+.mcp.json

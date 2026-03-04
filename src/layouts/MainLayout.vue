@@ -22,28 +22,28 @@
         <span class="text-body2 q-mr-md">{{ authStore.userId }}</span>
         <q-btn flat dense icon="logout" label="로그아웃" @click="handleLogout" />
       </q-toolbar>
-
-      <!-- 하위 메뉴 슬라이드 바 -->
-      <transition name="submenu">
-        <div v-if="activeMenu" class="submenu-bar" @click.stop>
-          <q-toolbar dense class="bg-blue-8">
-            <template v-for="menu in menuConfig" :key="menu.id">
-              <template v-if="activeMenu === menu.id">
-                <q-btn
-                  v-for="item in menu.children"
-                  :key="item.name"
-                  flat
-                  dense
-                  :label="item.label"
-                  class="q-mr-xs"
-                  @click="openSubMenuTab(item)"
-                />
-              </template>
-            </template>
-          </q-toolbar>
-        </div>
-      </transition>
     </q-header>
+
+    <!-- ── 서브 메뉴 오버레이 (헤더 외부, 콘텐츠 위에 겹침) ── -->
+    <transition name="submenu">
+      <div v-if="activeMenu" class="submenu-overlay" @click.stop>
+        <q-toolbar dense class="bg-blue-8">
+          <template v-for="menu in menuConfig" :key="menu.id">
+            <template v-if="activeMenu === menu.id">
+              <q-btn
+                v-for="item in menu.children"
+                :key="item.name"
+                flat
+                dense
+                :label="item.label"
+                class="q-mr-xs"
+                @click="openSubMenuTab(item)"
+              />
+            </template>
+          </template>
+        </q-toolbar>
+      </div>
+    </transition>
 
     <!-- ── 콘텐츠 영역 ── -->
     <q-page-container>
@@ -132,16 +132,36 @@ const menuConfig: MenuConfig[] = [
     id: 'business',
     label: '업무관리',
     children: [
-      { name: 'work-status', label: '업무현황', component: 'SamplePage', props: { pageTitle: '업무현황' } },
-      { name: 'work-register', label: '업무등록', component: 'SamplePage', props: { pageTitle: '업무등록' } },
+      {
+        name: 'work-status',
+        label: '메뉴1',
+        component: 'SamplePage',
+        props: { pageTitle: '메뉴1' },
+      },
+      {
+        name: 'work-register',
+        label: '메뉴2',
+        component: 'SamplePage',
+        props: { pageTitle: '메뉴2' },
+      },
     ],
   },
   {
     id: 'system',
     label: '시스템관리',
     children: [
-      { name: 'user-mgmt', label: '사용자관리', component: 'SamplePage', props: { pageTitle: '사용자관리' } },
-      { name: 'menu-mgmt', label: '메뉴관리', component: 'SamplePage', props: { pageTitle: '메뉴관리' } },
+      {
+        name: 'user-mgmt',
+        label: '사용자관리',
+        component: 'SamplePage',
+        props: { pageTitle: '사용자관리' },
+      },
+      {
+        name: 'menu-mgmt',
+        label: '메뉴관리',
+        component: 'SamplePage',
+        props: { pageTitle: '메뉴관리' },
+      },
     ],
   },
 ];
@@ -176,9 +196,20 @@ function handleLogout() {
 </script>
 
 <style scoped>
+/* 서브 메뉴 오버레이: 헤더 아래에 고정 위치, 콘텐츠 위에 겹침 */
+.submenu-overlay {
+  position: fixed;
+  top: 50px; /* q-toolbar 기본 높이 */
+  left: 0;
+  right: 0;
+  z-index: 5999; /* q-header(6000) 아래, 일반 콘텐츠 위 */
+}
+
 .submenu-enter-active,
 .submenu-leave-active {
-  transition: max-height 0.2s ease, opacity 0.2s ease;
+  transition:
+    max-height 0.2s ease,
+    opacity 0.2s ease;
   overflow: hidden;
 }
 .submenu-enter-from,

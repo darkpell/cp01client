@@ -38,8 +38,8 @@ export interface EssentialLinkProps {
 // withDefaults: 선택적 props에 기본값을 지정한다.
 // props가 전달되지 않으면 아래 기본값이 사용된다.
 withDefaults(defineProps<EssentialLinkProps>(), {
-  caption: '',  // 부제목 없음
-  link: '#',    // 이동 없음 (현재 페이지)
-  icon: '',     // 아이콘 없음 (v-if="icon"에 의해 아바타 섹션 숨김)
+  caption: '', // 부제목 없음
+  link: '#', // 이동 없음 (현재 페이지)
+  icon: '', // 아이콘 없음 (v-if="icon"에 의해 아바타 섹션 숨김)
 });
 </script>
