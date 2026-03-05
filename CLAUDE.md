@@ -17,18 +17,80 @@ Vue 3 + Quasar Framework + TypeScript 기반의 프론트엔드 클라이언트 
 
 ## 디렉토리 구조
 
+Feature Module 구조 (도메인별 응집): 관련 파일(페이지·스토어·설정)을 한 폴더에 모아 유지보수성을 높인다.
+
 ```
 src/
-├── assets/          # 정적 자산 (이미지, 폰트 등)
-├── boot/            # Quasar 부트 파일 (플러그인 초기화)
-├── components/      # 재사용 가능한 컴포넌트
-├── composables/     # 재사용 로직 (use* 접두사)
-├── layouts/         # 레이아웃 컴포넌트
-├── pages/           # 페이지 컴포넌트 (라우터와 1:1 매핑)
-├── router/          # Vue Router 설정
-├── stores/          # Pinia 스토어
-├── i18n/            # 다국어 리소스 파일
-└── types/           # TypeScript 타입 정의
+├── features/                  # 도메인별 기능 모듈 (핵심 구조)
+│   ├── auth/                  # 인증 도메인
+│   │   ├── LoginPage.vue      # 로그인 페이지
+│   │   └── auth-store.ts      # JWT/사용자 상태 (Pinia Setup Store)
+│   ├── workspace/             # 메인 작업 영역 도메인
+│   │   ├── MainLayout.vue     # 레이아웃 (헤더·서브메뉴·탭)
+│   │   ├── IndexPage.vue      # 홈(대시보드) 페이지
+│   │   ├── tab-store.ts       # 탭 상태 관리
+│   │   └── menu.config.ts     # 상단 메뉴 구조 정의 (UI와 데이터 분리)
+│   └── shared/                # 도메인 간 공유 컴포넌트·페이지
+│       └── SamplePage.vue     # 개발 예정 페이지 플레이스홀더
+│
+├── pages/                     # 독립 라우트 페이지 (레이아웃 없음)
+│   └── ErrorNotFound.vue      # 404 페이지
+│
+├── components/                # 전역 재사용 UI 컴포넌트 (도메인 무관)
+│
+├── composables/               # 전역 재사용 로직 (use* 접두사)
+│
+├── types/                     # 전역 TypeScript 타입 정의
+│   └── index.ts               # RouteMeta, PaginationMeta 등
+│
+├── router/                    # Vue Router (Quasar 규약 — 루트 유지)
+│   ├── index.ts               # 라우터 인스턴스 + 네비게이션 가드
+│   └── routes.ts              # 라우트 정의 (features/* alias 사용)
+│
+├── stores/                    # 전역 Pinia 설정 (Quasar 규약 — 루트 유지)
+│   └── index.ts               # Pinia 팩토리 (플러그인 등록 위치)
+│
+├── boot/                      # Quasar 부트 파일 (Quasar 규약 — 루트 유지)
+│   ├── axios.ts               # Axios 인스턴스 + JWT 인터셉터
+│   └── i18n.ts                # vue-i18n 초기화 (기본 언어: ko-KR)
+│
+├── i18n/                      # 다국어 리소스
+│   ├── index.ts               # 로케일 진입점
+│   ├── ko-KR/index.ts         # 한국어 (기본 언어)
+│   └── en-US/index.ts         # 영어
+│
+├── css/                       # 전역 스타일
+│   ├── app.scss               # 커스텀 전역 CSS
+│   └── quasar.variables.scss  # Quasar 테마 색상 변수
+│
+└── assets/                    # 정적 자산 (이미지, 폰트 등)
+```
+
+### 파일 배치 원칙
+
+| 파일 유형                 | 배치 위치            | 이유                         |
+| ------------------------- | -------------------- | ---------------------------- |
+| 도메인 페이지/스토어      | `features/{domain}/` | 관련 파일 응집               |
+| 도메인 간 공유 컴포넌트   | `features/shared/`   | 명확한 공유 의도             |
+| 전역 UI 컴포넌트          | `components/`        | 도메인 무관 범용             |
+| 재사용 로직               | `composables/`       | 컴포넌트와 로직 분리         |
+| 전역 타입                 | `types/`             | 도메인별 타입은 각 feature에 |
+| 레이아웃 없는 독립 페이지 | `pages/`             | 404 등                       |
+
+### Path Alias
+
+```typescript
+// router/routes.ts에서 features 모듈 import
+import('features/auth/LoginPage.vue'); // ✅ features/* alias
+import('features/workspace/MainLayout.vue'); // ✅ features/* alias
+
+// features 내부 상대 경로 사용
+import { useAuthStore } from './auth-store'; // 같은 feature
+import { useAuthStore } from '../auth/auth-store'; // 다른 feature
+import SamplePage from '../shared/SamplePage.vue'; // shared
+
+// Quasar 기본 alias (boot, src 등)는 그대로 사용
+import { api } from 'boot/axios';
 ```
 
 ## 코딩 컨벤션
@@ -55,9 +117,11 @@ src/
 
 ### Pinia 스토어 규칙
 
-- 파일명: `use{Name}Store.ts`
-- Composition API 스타일 정의 (`defineStore` + setup 함수)
+- 파일명: `{name}-store.ts` (도메인 스토어, features/ 내부) 또는 `use{Name}Store.ts` (전역)
+- Composition API 스타일 정의 (`defineStore` + setup 함수) — Options API 금지
 - 스토어당 단일 책임 원칙
+- 도메인 스토어는 해당 feature 폴더에 위치 (`features/auth/auth-store.ts`)
+- 전역 스토어(앱 수준 상태)만 `stores/`에 위치
 
 ### 파일 네이밍
 
@@ -94,6 +158,6 @@ npm run format     # Prettier 포맷팅 (전체 파일)
 
 ## 설정 업데이트 이력
 
-- 마지막 업그레이드: 2026-03-04
-- 다음 체크 권장: 2026-04-04 (월 1회 권장)
+- 마지막 업그레이드: 2026-03-05
+- 다음 체크 권장: 2026-04-05 (월 1회 권장)
 - 업그레이드 실행: `/upgrade-claude-code`

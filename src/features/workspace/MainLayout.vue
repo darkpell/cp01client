@@ -99,10 +99,11 @@
 <script setup lang="ts">
 import { ref, type Component } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAuthStore } from 'stores/auth-store';
-import { useTabStore, type TabItem } from 'stores/tab-store';
-import IndexPage from 'pages/IndexPage.vue';
-import SamplePage from 'pages/SamplePage.vue';
+import { useAuthStore } from '../auth/auth-store';
+import { useTabStore, type TabItem } from './tab-store';
+import { menuConfig, type SubMenuItem } from './menu.config';
+import IndexPage from './IndexPage.vue';
+import SamplePage from '../shared/SamplePage.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -113,58 +114,6 @@ const componentMap: Record<string, Component> = {
   IndexPage,
   SamplePage,
 };
-
-// ── 메뉴 설정 ──
-interface SubMenuItem {
-  name: string;
-  label: string;
-  component: string;
-  props?: Record<string, unknown>;
-}
-interface MenuConfig {
-  id: string;
-  label: string;
-  children: SubMenuItem[];
-}
-
-const menuConfig: MenuConfig[] = [
-  {
-    id: 'business',
-    label: '업무관리',
-    children: [
-      {
-        name: 'work-status',
-        label: '메뉴1',
-        component: 'SamplePage',
-        props: { pageTitle: '메뉴1' },
-      },
-      {
-        name: 'work-register',
-        label: '메뉴2',
-        component: 'SamplePage',
-        props: { pageTitle: '메뉴2' },
-      },
-    ],
-  },
-  {
-    id: 'system',
-    label: '시스템관리',
-    children: [
-      {
-        name: 'user-mgmt',
-        label: '사용자관리',
-        component: 'SamplePage',
-        props: { pageTitle: '사용자관리' },
-      },
-      {
-        name: 'menu-mgmt',
-        label: '메뉴관리',
-        component: 'SamplePage',
-        props: { pageTitle: '메뉴관리' },
-      },
-    ],
-  },
-];
 
 // ── 하위 메뉴 토글 ──
 const activeMenu = ref<string | null>(null);

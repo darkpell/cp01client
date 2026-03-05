@@ -25,7 +25,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useAuthStore } from 'stores/auth-store';
+import { useAuthStore } from '../auth/auth-store';
 
 const authStore = useAuthStore();
 

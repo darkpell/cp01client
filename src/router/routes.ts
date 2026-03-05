@@ -24,7 +24,7 @@ const routes: RouteRecordRaw[] = [
     // 로그인 페이지: 레이아웃 없이 단독 페이지로 렌더링
     // requiresGuest: 이미 로그인된 사용자가 접근하면 네비게이션 가드가 /로 리다이렉트
     path: '/login',
-    component: () => import('pages/LoginPage.vue'),
+    component: () => import('features/auth/LoginPage.vue'),
     meta: { requiresGuest: true },
   },
   {
@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
     // requiresAuth: 비로그인 상태로 접근하면 네비게이션 가드가 /login으로 리다이렉트
     // children 없음: MainLayout이 탭 방식으로 콘텐츠를 직접 관리
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('features/workspace/MainLayout.vue'),
     meta: { requiresAuth: true },
   },
 

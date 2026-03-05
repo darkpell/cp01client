@@ -60,7 +60,14 @@ export default defineConfig((ctx) => {
       // polyfillModulePreload: true,
       // distDir
 
-      // extendViteConf (viteConf) {},
+      extendViteConf(viteConf) {
+        viteConf.resolve ??= {};
+        const existing = viteConf.resolve.alias ?? {};
+        viteConf.resolve.alias = {
+          ...(Array.isArray(existing) ? {} : existing),
+          features: fileURLToPath(new URL('./src/features', import.meta.url)),
+        };
+      },
       // viteVuePluginOptions: {},
 
       vitePlugins: [
