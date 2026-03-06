@@ -12,7 +12,7 @@ export default defineConfig((ctx) => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ['i18n', 'axios'],
+    boot: ['i18n', 'axios', 'ag-grid'],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ['app.scss'],
@@ -110,6 +110,10 @@ export default defineConfig((ctx) => {
         // 백엔드 API 경로를 개발 서버가 중계하여 CORS 우회
         // 브라우저 → localhost:9000/auth/... → (proxy) → localhost:8080/auth/...
         '/auth': {
+          target: 'http://localhost:8080',
+          changeOrigin: true,
+        },
+        '/api': {
           target: 'http://localhost:8080',
           changeOrigin: true,
         },

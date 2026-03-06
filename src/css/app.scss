@@ -1,1 +1,6 @@
 // app global css in SCSS form
+
+// AG Grid 기본 레이아웃 CSS
+@import 'ag-grid-community/styles/ag-grid.css';
+// Quartz 테마 (Material Design 계열, Quasar와 시각적 일치)
+@import 'ag-grid-community/styles/ag-theme-quartz.css';

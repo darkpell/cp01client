@@ -55,14 +55,12 @@ export const menuConfig: MenuConfig[] = [
       {
         name: 'user-mgmt',
         label: '사용자관리',
-        component: 'SamplePage',
-        props: { pageTitle: '사용자관리' },
+        component: 'UserManagePage',
       },
       {
         name: 'menu-mgmt',
         label: '메뉴관리',
-        component: 'SamplePage',
-        props: { pageTitle: '메뉴관리' },
+        component: 'MenuManagePage',
       },
     ],
   },

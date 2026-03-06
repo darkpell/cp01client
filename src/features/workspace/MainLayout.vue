@@ -104,6 +104,8 @@ import { useTabStore, type TabItem } from './tab-store';
 import { menuConfig, type SubMenuItem } from './menu.config';
 import IndexPage from './IndexPage.vue';
 import SamplePage from '../shared/SamplePage.vue';
+import UserManagePage from '../system/UserManagePage.vue';
+import MenuManagePage from '../system/MenuManagePage.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -113,6 +115,8 @@ const tabStore = useTabStore();
 const componentMap: Record<string, Component> = {
   IndexPage,
   SamplePage,
+  UserManagePage,
+  MenuManagePage,
 };
 
 // ── 하위 메뉴 토글 ──

@@ -30,3 +30,68 @@ export interface PaginationMeta {
   page?: number;
   pageSize?: number;
 }
+
+// ── 사용자 관리 타입 ──────────────────────────────────
+
+/** GET /api/users 응답 DTO */
+export interface UserDto {
+  id: number;
+  userId: string;
+  userName: string;
+  email: string;
+  role: string;
+}
+
+/** POST /api/users 요청 DTO */
+export interface UserCreateDto {
+  userId: string;
+  userName: string;
+  email: string;
+  password: string;
+}
+
+/** PUT /api/users/{id} 요청 DTO */
+export interface UserUpdateDto {
+  userName: string;
+  email: string;
+}
+
+// ── 메뉴 관리 타입 ──────────────────────────────────
+
+/** GET /api/menus 응답 DTO (평면 구조) */
+export interface MenuDto {
+  id: number;
+  menuCode: string;
+  menuName: string;
+  menuUrl: string | null;
+  menuOrder: number;
+  parentId: number | null;
+  icon: string | null;
+  allowedRoles: string[];
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** POST /api/menus 요청 DTO */
+export interface MenuCreateDto {
+  menuCode: string;
+  menuName: string;
+  menuUrl?: string;
+  menuOrder?: number;
+  parentId?: number | null;
+  icon?: string;
+  allowedRoles: string[];
+  isActive?: boolean;
+}
+
+/** PUT /api/menus/{id} 요청 DTO */
+export interface MenuUpdateDto {
+  menuName: string;
+  menuUrl?: string;
+  menuOrder?: number;
+  parentId?: number | null;
+  icon?: string;
+  allowedRoles: string[];
+  isActive: boolean;
+}
